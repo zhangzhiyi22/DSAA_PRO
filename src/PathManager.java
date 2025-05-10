@@ -64,7 +64,7 @@ public class PathManager {
         
         try {
             PixelNode start = getNode(lastConfirmedPoint);
-            PixelNode end = isClosable ? getNode(firstPoint) : getNode(targetPoint);
+            PixelNode end = isClosable ? getNode(firstPoint) : getNode(currentSnappedPoint);
             List<PixelNode> path = PathPlanner.computeShortestPathToTarget(costGraph, start, end);
             
             if (path.isEmpty()) {
@@ -73,7 +73,7 @@ public class PathManager {
             }
             
             confirmedPaths.add(path);
-            lastConfirmedPoint = targetPoint;
+            lastConfirmedPoint = currentSnappedPoint;
             
             if (isClosable) {
                 mainFrame.getStatusLabel().setText("路径已闭合，正在抠图...");
@@ -93,11 +93,11 @@ public class PathManager {
      */
     public void handleMouseMove(Point imagePoint) {
         if (costGraph == null || lastConfirmedPoint == null) return;
-        
+
         // 尝试找到边缘点
         double[][] costImage = mainFrame.getImageProcessor().getCostImage();
         Point snapped = edgeDetector.findBestEdgeFromCost(imagePoint, SNAP_RADIUS, costImage);
-        
+
         if (snapped != null) {
             currentSnappedPoint = snapped;
 
@@ -118,7 +118,7 @@ public class PathManager {
             // 更新状态栏
             updateStatusBarForPath(tempPath);
         }
-        
+
 //         计算是否可以闭合路径
         Point target = currentSnappedPoint != null ? currentSnappedPoint : imagePoint;
         if (isValidPoint(target)) {
