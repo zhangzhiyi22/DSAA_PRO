@@ -70,6 +70,17 @@ public class UIManager {
                 handleMouseMove(e);
             }
         });
+
+        // 鼠标右键点击监听器，撤销上次操作
+        imageLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    Point imagePoint = imageProcessor.convertPointToImageCoordinates(e.getPoint());
+                    pathManager.handleRightClick(imagePoint);
+                }
+            }
+        });
     }
     
     /**
@@ -78,16 +89,7 @@ public class UIManager {
     private void handleMouseClick(MouseEvent e) {
         Point imagePoint = imageProcessor.convertPointToImageCoordinates(e.getPoint());
         if (imagePoint == null) return;
-        
-        // 如果按Ctrl并有推荐点，使用推荐点
         Point targetPoint = imagePoint;
-        if (pathManager.hasSuggestedPoint() && e.isControlDown()) {
-            targetPoint = pathManager.getSuggestedPoint();
-            mainFrame.getStatusLabel().setText("已接受建议点");
-        } else if (pathManager.hasSnappedPoint()) {
-            targetPoint = pathManager.getCurrentSnappedPoint();
-        }
-        
         // 处理点击位置
         pathManager.handleClickAtPoint(targetPoint);
     }

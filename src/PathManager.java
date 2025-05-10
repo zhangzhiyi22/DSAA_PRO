@@ -138,6 +138,13 @@ public class PathManager {
             }
         }
     }
+
+    // 右键撤销上一次操作
+    public void handleRightClick(Point imagePoint) {
+        if (isValidPoint(imagePoint)) {
+            undoLastConfirmedPath();
+        }
+    }
     
     /**
      * 用临时路径和稳定状态更新预览
@@ -235,7 +242,32 @@ public class PathManager {
         }
         mainFrame.getStatusLabel().setText("请点击图像设置起点");
     }
-    
+
+    public void undoLastConfirmedPath() {
+        if (!confirmedPaths.isEmpty()) {
+            // 移除最后一段路径
+            confirmedPaths.remove(confirmedPaths.size() - 1);
+
+            // 恢复上一个确认点
+            if (confirmedPaths.isEmpty()) {
+                lastConfirmedPoint = firstPoint = null;
+                mainFrame.getStatusLabel().setText("已撤销所有路径，请重新设置起点");
+            } else {
+                // 获取最新路径的终点作为 lastConfirmedPoint
+                List<PixelNode> lastPath = confirmedPaths.get(confirmedPaths.size() - 1);
+                PixelNode lastNode = lastPath.get(lastPath.size() - 1);
+                lastConfirmedPoint = new Point(lastNode.x, lastNode.y);
+                mainFrame.getStatusLabel().setText("已撤销上一个路径");
+            }
+
+            // 更新预览显示
+            updatePreviewWithPath(null, false);
+        } else {
+            mainFrame.getStatusLabel().setText("无可撤销路径");
+        }
+    }
+
+
     /**
      * 将点坐标转换为图中的键
      */
