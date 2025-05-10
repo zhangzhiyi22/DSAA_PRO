@@ -24,7 +24,7 @@ public class PathManager {
     // 路径状态
     private boolean isClosable = false;
     private static final int CLOSE_PATH_THRESHOLD = 15; // 闭合判定阈值
-    private static final int SNAP_RADIUS = 9; // 吸附搜索半径
+    private static final int SNAP_RADIUS = 7; // 吸附搜索半径
 
     private static final long STABILITY_MESSAGE_DURATION = 2000; // 0.5秒显示时间
     private Timer stabilityTimer;
