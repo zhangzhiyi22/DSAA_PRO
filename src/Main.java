@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 
-public class Main_new_koutu extends JFrame {
+public class Main extends JFrame {
     // UI组件
     private JLabel imageLabel;
     private JLabel statusLabel;
@@ -19,7 +19,7 @@ public class Main_new_koutu extends JFrame {
     /**
      * 构造函数
      */
-    public Main_new_koutu(String imagePath) {
+    public Main(String imagePath) {
         this.imagePath = imagePath;
         setTitle("智能剪刀");
         setSize(800, 600);
@@ -105,7 +105,7 @@ public class Main_new_koutu extends JFrame {
                 File selectedFile = fileChooser.getSelectedFile();
                 String imagePath = selectedFile.getAbsolutePath();
 
-                Main_new_koutu ui = new Main_new_koutu(imagePath);
+                Main ui = new Main(imagePath);
                 ui.setVisible(true);
             } else {
                 System.exit(0);

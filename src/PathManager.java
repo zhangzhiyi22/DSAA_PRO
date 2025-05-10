@@ -9,7 +9,7 @@ import java.util.Map;
  * 路径管理器：负责路径的创建、更新和管理
  */
 public class PathManager {
-    private final Main_new_koutu mainFrame;
+    private final Main mainFrame;
     private final PathStabilityTracker stabilityTracker;
     private final EdgeDetector edgeDetector;
     
@@ -33,7 +33,7 @@ public class PathManager {
     /**
      * 构造函数
      */
-    public PathManager(Main_new_koutu mainFrame, PathStabilityTracker stabilityTracker, EdgeDetector edgeDetector) {
+    public PathManager(Main mainFrame, PathStabilityTracker stabilityTracker, EdgeDetector edgeDetector) {
         this.mainFrame = mainFrame;
         this.stabilityTracker = stabilityTracker;
         this.edgeDetector = edgeDetector;

@@ -11,7 +11,7 @@ import java.util.List;
  * 图像处理器：负责图像加载、处理和渲染
  */
 public class ImageProcessor {
-    private final Main_new_koutu mainFrame;
+    private final Main mainFrame;
     
     private BufferedImage originalImage;
     private BufferedImage displayImage;
@@ -21,7 +21,7 @@ public class ImageProcessor {
     /**
      * 构造函数
      */
-    public ImageProcessor(Main_new_koutu mainFrame) {
+    public ImageProcessor(Main mainFrame) {
         this.mainFrame = mainFrame;
     }
     

@@ -7,11 +7,11 @@ import java.io.File;
  * UI管理器：负责界面交互和事件处理
  */
 public class UIManager {
-    private final Main_new_koutu mainFrame;
+    private final Main mainFrame;
     private final ImageProcessor imageProcessor;
     private final PathManager pathManager;
     
-    public UIManager(Main_new_koutu mainFrame, ImageProcessor imageProcessor, PathManager pathManager) {
+    public UIManager(Main mainFrame, ImageProcessor imageProcessor, PathManager pathManager) {
         this.mainFrame = mainFrame;
         this.imageProcessor = imageProcessor;
         this.pathManager = pathManager;
