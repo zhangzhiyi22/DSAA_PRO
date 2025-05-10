@@ -1,8 +1,11 @@
 import java.util.*;
+import java.util.List;
 
 
 public class PathPlanner {
-    
+
+
+    public static boolean stabled = false; // 是否稳定
     // 路径信息类
     static class PathInfo {
         double cost;                // 从起点到当前点的总成本
@@ -14,89 +17,80 @@ public class PathPlanner {
             this.path = path;
         }
     }
-    
-    // 计算从种子点到所有其他像素的最小成本路径
-    public static Map<String, PathInfo> computeMinimumCostPath(Map<String, PixelNode> graph, PixelNode seed) {
-        Map<String, PathInfo> pathMap = new HashMap<>();
+
+
+    public static List<PixelNode> computeShortestPathToTarget(
+            Map<String, PixelNode> graph, PixelNode seed, PixelNode target) {
+        stabled=false;
+//        System.out.println("11"+stabled);
+
+        String targetKey = target.x + "," + target.y;
+
+        // 最短路径表
+        Map<String, Double> costMap = new HashMap<>();
+        Map<String, List<PixelNode>> pathMap = new HashMap<>();
+
         PriorityQueue<PixelNode> queue = new PriorityQueue<>(
-            (a, b) -> Double.compare(
-                pathMap.get(a.x + "," + a.y).cost,
-                pathMap.get(b.x + "," + b.y).cost
-            )
+                Comparator.comparingDouble(n -> costMap.getOrDefault(n.x + "," + n.y, Double.POSITIVE_INFINITY))
         );
-        
-        // 已处理节点集合
+
         Set<String> visited = new HashSet<>();
-        
-        // 初始化所有节点的路径信息
-        for (String key : graph.keySet()) {
-            if (key.equals(seed.x + "," + seed.y)) {
-                // 种子节点到自身的成本为0
-                List<PixelNode> seedPath = new ArrayList<>();
-                seedPath.add(seed);
-                pathMap.put(key, new PathInfo(0, seedPath));
-            } else {
-                // 其他节点初始化为无穷大
-                pathMap.put(key, new PathInfo(Double.POSITIVE_INFINITY, new ArrayList<>()));
-            }
-        }
-        
-        // 将种子节点加入队列
+
+        String seedKey = seed.x + "," + seed.y;
+        costMap.put(seedKey, 0.0);
+        pathMap.put(seedKey, new ArrayList<>(List.of(seed)));
         queue.add(seed);
-        
-        // Dijkstra算法主循环
+
         while (!queue.isEmpty()) {
-            // 取出当前成本最小的节点
             PixelNode current = queue.poll();
             String currentKey = current.x + "," + current.y;
-            
-            // 如果节点已处理，跳过
-            if (visited.contains(currentKey)) {
-                continue;
+
+            // 如果到达终点，立即返回
+            if (currentKey.equals(targetKey)) {
+                double minCost = costMap.get(targetKey);  // 获取目标节点的最小代价
+                int totalPoints = pathMap.get(targetKey).size();
+                if (minCost/totalPoints<1.6&&totalPoints>50) {
+                    // stable status
+                    stabled = true;
+                }
+                return pathMap.get(currentKey);
             }
 
+            if (visited.contains(currentKey)) continue;
             visited.add(currentKey);
-            
-            // 当前节点的路径信息
-            PathInfo currentInfo = pathMap.get(currentKey);
-            
-            // 检查所有邻居
+
+            double currentCost = costMap.get(currentKey);
+            List<PixelNode> currentPath = pathMap.get(currentKey);
+
             for (PixelNode.Neighbor neighbor : current.neighbors) {
                 PixelNode next = neighbor.node;
                 String nextKey = next.x + "," + next.y;
-                
-                // 已访问的节点跳过
-                if (visited.contains(nextKey)) {
-                    continue;
-                }
-                
-                // 计算移动成本（对角线移动需要乘以根号2）
+
+                if (visited.contains(nextKey)) continue;
+
                 double moveCost = neighbor.link_cost;
                 if (isDiagonal(current, next)) {
                     moveCost *= Math.sqrt(2);
                 }
-                
-                // 计算新路径总成本
-                double newCost = currentInfo.cost + moveCost;
-                
-                // 如果找到更短路径，更新信息
-                if (newCost < pathMap.get(nextKey).cost) {
-                    // 创建新路径（复制当前路径并添加新节点）
-                    List<PixelNode> newPath = new ArrayList<>(currentInfo.path);
+
+                double newCost = currentCost + moveCost;
+                double existingCost = costMap.getOrDefault(nextKey, Double.POSITIVE_INFINITY);
+
+                if (newCost < existingCost) {
+                    costMap.put(nextKey, newCost);
+                    List<PixelNode> newPath = new ArrayList<>(currentPath);
                     newPath.add(next);
-                    
-                    // 更新路径信息
-                    pathMap.put(nextKey, new PathInfo(newCost, newPath));
-                    
-                    // 将邻居加入队列
+                    pathMap.put(nextKey, newPath);
                     queue.add(next);
                 }
             }
         }
-        
-        return pathMap;
+
+        // 如果找不到路径，返回空列表
+        return new ArrayList<>();
     }
-    
+
+
     // 判断两个节点是否为对角线关系
     private static boolean isDiagonal(PixelNode a, PixelNode b) {
         return a.x != b.x && a.y != b.y;

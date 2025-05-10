@@ -1,10 +1,7 @@
-import java.awt.*;
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
 import java.util.Map;
-import javax.imageio.ImageIO;
 
 
 // 将图片转换为一个代价图片的类
@@ -30,7 +27,7 @@ public class CostGraphGenerator {
     public int getHeight() {
         return this.height;
     }
-    
+
 
     // 获取代价矩阵
     public double[][] getCostImage() {
@@ -117,81 +114,6 @@ public class CostGraphGenerator {
         return graph;
     }
 
-    // 可视化代价矩阵，用于测试
-    public BufferedImage visualizeCostGraph(double[][] costGraph) {
-        int width = costGraph.length;
-        int height = costGraph[0].length;
-
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                // 归一化到 [0, 255]，值越小代表越像边缘（成本低）
-                int gray = (int) (255 * (costGraph[i][j]));
-                gray = Math.max(0, Math.min(255, gray));
-                int rgb = new Color(gray, gray, gray).getRGB();
-                img.setRGB(i, j, rgb);
-            }
-        }
-        return img;
-    }
-
-    // 保存图片
-    public void saveImage(BufferedImage img, String filename) {
-        try {
-            File output = new File(filename);
-            ImageIO.write(img, "png", output);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public BufferedImage visualizePath(double[][] costImage, List<PixelNode> path) {
-    
-        BufferedImage pathImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                // 将代价值转换为灰度值（0-255）
-                int grayValue = (int)(costImage[x][y] * 255);
-                int rgb = new Color(grayValue, grayValue, grayValue).getRGB();
-                pathImage.setRGB(x, y, rgb);
-            }
-        }
-        
-        // 绘制路径
-        Color pathColor = Color.RED;
-        for (PixelNode node : path) {
-            if (node.x >= 0 && node.x < width && node.y >= 0 && node.y < height) {
-                pathImage.setRGB(node.x, node.y, pathColor.getRGB());
-            }
-        }
-        
-        // 标记起点和终点
-        if (!path.isEmpty()) {
-            // 起点
-            PixelNode start = path.get(0);
-            markPoint(pathImage, start.x, start.y, Color.GREEN, 2);
-            
-            // 终点
-            PixelNode end = path.get(path.size() - 1);
-            markPoint(pathImage, end.x, end.y, Color.BLUE, 2);
-        }
-        
-        return pathImage;
-    }
-
-    private void markPoint(BufferedImage image, int x, int y, Color color, int size) {
-        int radius = size / 2;
-        for (int i = -radius; i <= radius; i++) {
-            for (int j = -radius; j <= radius; j++) {
-                int px = x + i;
-                int py = y + j;
-                if (px >= 0 && px < width && py >= 0 && py < height) {
-                    image.setRGB(px, py, color.getRGB());
-                }
-            }
-        }
-    }
 }
 
 
